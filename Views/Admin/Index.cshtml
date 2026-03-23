@@ -1,0 +1,102 @@
+@model List<ActivityLog>
+@{
+    ViewBag.Title = "Dashboard - Admin";
+}
+
+<div class="container py-5">
+    <h2 style="color: #B8956D; font-weight: bold; margin-bottom: 2rem;">
+        <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+    </h2>
+
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <i class="fas fa-users"></i>
+                <div class="stat-number">@ViewBag.TotalUsers</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="background: linear-gradient(135deg, #8B7355 0%, #6B5744 100%);">
+                <i class="fas fa-building"></i>
+                <div class="stat-number">@ViewBag.TotalProperties</div>
+                <div class="stat-label">Total Properties</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div class="stat-number">@ViewBag.PendingProperties</div>
+                <div class="stat-label">Pending Approval</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card" style="background: linear-gradient(135deg, #8B7355 0%, #6B5744 100%);">
+                <i class="fas fa-check-circle"></i>
+                <div class="stat-number">@ViewBag.ActiveProperties</div>
+                <div class="stat-label">Active Properties</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <a href="/Admin/ManageUsers" class="btn btn-primary me-2">
+                        <i class="fas fa-users"></i> Manage Users
+                    </a>
+                    <a href="/Admin/PendingUsers" class="btn btn-warning">
+                        <i class="fas fa-user-check"></i> Approve Users
+                    </a>
+                    <a href="/Admin/ManageProperties" class="btn btn-primary me-2">
+                        <i class="fas fa-building"></i> Manage Properties
+                    </a>
+                    <a href="/Admin/ManageLocalities" class="btn btn-primary me-2">
+                        <i class="fas fa-map-marker-alt"></i> Manage Localities
+                    </a>
+                    <a href="/Admin/ManagePropertyTypes" class="btn btn-primary me-2">
+                        <i class="fas fa-list"></i> Property Types
+                    </a>
+                    <a href="/Admin/SystemReports" class="btn btn-primary">
+                        <i class="fas fa-chart-bar"></i> Reports
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <h3 style="color: #B8956D; font-weight: bold; margin-bottom: 1.5rem;">
+        <i class="fas fa-history"></i> Recent Activity
+    </h3>
+
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Description</th>
+                        <th>Date & Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var log in Model)
+                    {
+                        <tr>
+                            <td>@log.User?.FullName</td>
+                            <td><span class="badge bg-info">@log.Action</span></td>
+                            <td>@log.Description</td>
+                            <td>@log.CreatedDate.ToString("dd MMM yyyy hh:mm tt")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

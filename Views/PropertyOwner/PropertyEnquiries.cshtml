@@ -1,0 +1,96 @@
+@model List<Enquiry>
+@{
+    ViewBag.Title = "Property Enquiries - Property Owner";
+}
+
+<div class="container py-5">
+    <h2 style="color: #B8956D; font-weight: bold; margin-bottom: 2rem;">
+        <i class="fas fa-envelope"></i> Enquiries for @ViewBag.Property?.PropertyTitle
+    </h2>
+
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="row">
+            @foreach (var enquiry in Model)
+            {
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5 style="margin: 0;">@enquiry.Customer?.FullName</h5>
+                                    <small class="text-muted">@enquiry.CreatedDate.ToString("dd MMM yyyy hh:mm tt")</small>
+                                </div>
+                                <span class="badge bg-@GetStatusColor(enquiry.EnquiryStatus)">@enquiry.EnquiryStatus</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Contact:</strong> @enquiry.Customer?.PhoneNumber</p>
+                            <p><strong>Email:</strong> @enquiry.Customer?.Email</p>
+                            <hr>
+                            <p><strong>Message:</strong></p>
+                            <p>@enquiry.EnquiryMessage</p>
+
+                            @if (enquiry.Responses.Count > 0)
+                            {
+                                <hr>
+                                <p><strong><i class="fas fa-comments"></i> Responses:</strong></p>
+                                @foreach (var response in enquiry.Responses)
+                                {
+                                    <div class="bg-light p-2 rounded mb-2">
+                                        <small><strong>@response.RespondedByUser?.FullName</strong> - @response.CreatedDate.ToString("dd MMM yyyy")</small>
+                                        <p style="margin-top: 0.5rem; margin-bottom: 0;">@response.ResponseMessage</p>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <div class="card-footer">
+                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#respond_@enquiry.EnquiryId">
+                                <i class="fas fa-reply"></i> Respond
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Response Form -->
+                    <div class="collapse mt-3" id="respond_@enquiry.EnquiryId">
+                        <div class="card">
+                            <div class="card-body">
+                                <textarea id="responseMessage_@enquiry.EnquiryId" class="form-control mb-2" rows="3" placeholder="Write your response..." maxlength="2000"></textarea>
+                                <button type="button" class="btn btn-primary" onclick="respondToEnquiry(@enquiry.EnquiryId)">
+                                    <i class="fas fa-paper-plane"></i> Send Response
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> No enquiries received for this property yet.
+        </div>
+    }
+
+    <div class="mt-4">
+        <a href="/PropertyOwner/Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Properties
+        </a>
+    </div>
+</div>
+
+@functions {
+    string GetStatusColor(EnquiryStatus status)
+    {
+        return status switch
+        {
+            EnquiryStatus.New => "info",
+            EnquiryStatus.InProgress => "warning",
+            EnquiryStatus.Contacted => "primary",
+            EnquiryStatus.Closed => "success",
+            EnquiryStatus.Rejected => "danger",
+            _ => "secondary"
+        };
+    }
+}

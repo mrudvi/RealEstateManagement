@@ -1,0 +1,154 @@
+@model List<Property>
+@{
+    ViewBag.Title = "Dashboard - Builder";
+}
+
+<div class="container py-5">
+
+    <!-- Header -->
+    <h2 class="dashboard-title">
+        <i class="fas fa-building"></i> Builder Dashboard
+    </h2>
+
+    <!-- Statistics -->
+    <div class="row mb-4">
+
+        <div class="col-md-4">
+            <div class="stat-card">
+                <i class="fas fa-city"></i>
+                <div class="stat-number">@ViewBag.TotalProperties</div>
+                <div class="stat-label">Total Properties</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="stat-card dark">
+                <i class="fas fa-envelope"></i>
+                <div class="stat-number">@ViewBag.TotalEnquiries</div>
+                <div class="stat-label">Enquiries</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="stat-card">
+                <i class="fas fa-calendar"></i>
+                <div class="stat-number">@ViewBag.TotalVisits</div>
+                <div class="stat-label">Site Visits</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card custom-card">
+                <div class="card-body">
+
+                    <a href="/Builder/AddProperty" class="btn btn-main me-2">
+                        <i class="fas fa-plus"></i> Add Property
+                    </a>
+
+                    <a href="/Builder/ManageEnquiries" class="btn btn-main me-2">
+                        <i class="fas fa-envelope"></i> Enquiries
+                    </a>
+
+                    <a href="/Builder/ManageSiteVisits" class="btn btn-main">
+                        <i class="fas fa-calendar"></i> Visits
+                    </a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Properties -->
+    <h3 class="section-title">
+        <i class="fas fa-home"></i> My Properties
+    </h3>
+
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="table-responsive">
+            <table class="table table-hover custom-table">
+
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Location</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Verified</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var property in Model)
+                    {
+                        <tr>
+                            <td><strong>@property.PropertyTitle</strong></td>
+
+                            <td>@property.PropertyType?.TypeName</td>
+
+                            <td>@property.Locality?.LocalityName</td>
+
+                            <td>₹@property.PropertyPrice.ToString("N0")</td>
+
+                            <td>
+                                <span class="badge bg-@GetStatusColor(property.Status)">
+                                    @property.Status
+                                </span>
+                            </td>
+
+                            <td>
+                                @if (property.IsVerified)
+                                {
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle"></i>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning">Pending</span>
+                                }
+                            </td>
+
+                            <td>
+                                <a href="/Builder/AddProperty/@property.PropertyId"
+                                   class="btn btn-sm btn-main">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info custom-alert">
+            <i class="fas fa-info-circle"></i>
+            No properties added yet.
+        </div>
+    }
+
+</div>
+
+@functions {
+    string GetStatusColor(PropertyStatus status)
+    {
+        return status switch
+        {
+            PropertyStatus.Active => "success",
+            PropertyStatus.Pending => "warning",
+            PropertyStatus.Inactive => "danger",
+            PropertyStatus.Sold => "info",
+            PropertyStatus.Rented => "primary",
+            _ => "secondary"
+        };
+    }
+}

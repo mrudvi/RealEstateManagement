@@ -1,0 +1,56 @@
+@model List<Propertytype>
+@{
+    ViewBag.Title = "Manage Property Types - Admin";
+}
+
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2 style="color: #B8956D; font-weight: bold; margin-bottom: 1rem;">
+                <i class="fas fa-list"></i> Manage Property Types
+            </h2>
+            <a href="/Admin/AddPropertyType" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add New Type
+            </a>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Type Name</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var type in Model)
+                {
+                    <tr>
+                        <td>@type.TypeName</td>
+                        <td>@(string.IsNullOrEmpty(type.Description) ? "-" : type.Description.Substring(0, Math.Min(50, type.Description.Length)) + "...")</td>
+                        <td>
+                            @if (type.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Inactive</span>
+                            }
+                        </td>
+                        <td>@type.CreatedDate.ToString("dd MMM yyyy")</td>
+                        <td>
+                            <a href="/Admin/EditPropertyType/@type.PropertyTypeId" class="btn btn-sm btn-primary">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

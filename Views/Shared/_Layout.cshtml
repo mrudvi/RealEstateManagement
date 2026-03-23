@@ -1,0 +1,153 @@
+﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Real Estate Surat</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-home"></i> Real Estate Surat
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    @{
+                        var userId = HttpContextAccessor.HttpContext?.Session.GetInt32("UserId");
+                        var userType = HttpContextAccessor.HttpContext?.Session.GetString("UserType");
+                        var userName = HttpContextAccessor.HttpContext?.Session.GetString("UserName");
+                    }
+
+                    @if (userId == null)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Home/Search">Search Properties</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn-login" href="/Auth/Login">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn-register" href="/Auth/Register">Register</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">Home</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle"></i> @userName
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                @if (userType == "Customer")
+                                {
+                                    <li><a class="dropdown-item" href="/Customer/Index">Dashboard</a></li>
+                                    <li><a class="dropdown-item" href="/Customer/MyFavorites">My Favorites</a></li>
+                                    <li><a class="dropdown-item" href="/Customer/MyEnquiries">My Enquiries</a></li>
+                                    <li><a class="dropdown-item" href="/Customer/MySiteVisits">My Site Visits</a></li>
+                                }
+                                else if (userType == "PropertyOwner")
+                                {
+                                    <li><a class="dropdown-item" href="/PropertyOwner/Index">Dashboard</a></li>
+                                    <li><a class="dropdown-item" href="/PropertyOwner/AddProperty">Add Property</a></li>
+                                }
+                                else if (userType == "Broker")
+                                {
+                                    <li><a class="dropdown-item" href="/Broker/Index">Dashboard</a></li>
+                                    <li><a class="dropdown-item" href="/Broker/AddProperty">Add Property</a></li>
+                                }
+                                else if (userType == "Builder")
+                                {
+                                    <li><a class="dropdown-item" href="/Builder/Index">Dashboard</a></li>
+                                    <li><a class="dropdown-item" href="/Builder/AddProperty">Add Property</a></li>
+                                }
+                                else if (userType == "Admin")
+                                {
+                                    <li><a class="dropdown-item" href="/Admin/Index">Dashboard</a></li>
+                                    <li><a class="dropdown-item" href="/Admin/ManageUsers">Manage Users</a></li>
+                                    <li><a class="dropdown-item" href="/Admin/ManageProperties">Manage Properties</a></li>
+                                    <li><a class="dropdown-item" href="/Admin/ManageLocalities">Manage Localities</a></li>
+                                    <li><a class="dropdown-item" href="/Admin/SystemReports">Reports</a></li>
+                                }
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/Customer/Profile">Profile</a></li>
+                                <li><a class="dropdown-item" href="/Auth/Logout">Logout</a></li>
+                            </ul>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Alert Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+            <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Main Content -->
+    <main class="main-content">
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-custom">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5><i class="fas fa-home"></i> Real Estate Surat</h5>
+                    <p>Your trusted platform for buying, selling, and renting properties in Surat.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Quick Links</h5>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/Home/Search">Search Properties</a></li>
+                        <li><a href="/Auth/Register">Register</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Contact Us</h5>
+                    <p><i class="fas fa-phone"></i> +91 XXXX-XXXX-XX</p>
+                    <p><i class="fas fa-envelope"></i> info@realestatesurat.com</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Surat, Gujarat</p>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p>&copy; 2026 Real Estate Surat. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="~/js/script.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

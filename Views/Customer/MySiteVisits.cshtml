@@ -1,0 +1,64 @@
+@model List<SiteVisit>
+@{
+    ViewBag.Title = "My Site Visits - Customer";
+}
+
+<div class="container py-5">
+    <h2 style="color: #B8956D; font-weight: bold; margin-bottom: 2rem;">
+        <i class="fas fa-calendar"></i> My Site Visits
+    </h2>
+
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="row">
+            @foreach (var visit in Model)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 style="margin: 0;">@visit.Property?.PropertyTitle</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong><i class="fas fa-map-marker-alt"></i> Location:</strong> @visit.Property?.Locality.LocalityName</p>
+                            <p><strong><i class="fas fa-calendar"></i> Date:</strong> @visit.ScheduledDate.ToString("dd MMM yyyy")</p>
+                            <p><strong><i class="fas fa-clock"></i> Time:</strong> @visit.ScheduledTime</p>
+                            <p>
+                                <strong><i class="fas fa-info-circle"></i> Status:</strong>
+                                <span class="badge bg-@GetStatusColor(visit.VisitStatus)">@visit.VisitStatus</span>
+                            </p>
+                            @if (!string.IsNullOrEmpty(visit.Notes))
+                            {
+                                <p><strong>Notes:</strong> @visit.Notes</p>
+                            }
+                        </div>
+                        <div class="card-footer">
+                            <a href="/Home/PropertyDetails/@visit.PropertyId" class="btn btn-sm btn-primary">
+                                <i class="fas fa-eye"></i> View Property
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> You haven't scheduled any site visits yet.
+        </div>
+    }
+</div>
+
+@functions {
+    string GetStatusColor(VisitStatus status)
+    {
+        return status switch
+        {
+            VisitStatus.Scheduled => "info",
+            VisitStatus.Completed => "success",
+            VisitStatus.Cancelled => "danger",
+            VisitStatus.NoShow => "warning",
+            _ => "secondary"
+        };
+    }
+}

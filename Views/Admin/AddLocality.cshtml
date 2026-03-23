@@ -1,0 +1,48 @@
+@model Locality
+@{
+    ViewBag.Title = "Add Locality - Admin";
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-6 offset-lg-3">
+            <div class="card">
+                <div class="card-header">
+                    <h4 style="margin: 0;"><i class="fas fa-plus"></i> Add New Locality</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">Locality Name</label>
+                            <input asp-for="LocalityName" class="form-control" required>
+                            <span asp-validation-for="LocalityName" class="invalid-feedback"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Area</label>
+                            <input asp-for="Area" class="form-control">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Zip Code</label>
+                            <input asp-for="ZipCode" class="form-control" pattern="[0-9]{6}">
+                            <small class="text-muted">6 digits</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-plus"></i> Add Locality
+                            </button>
+                            <a href="/Admin/ManageLocalities" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

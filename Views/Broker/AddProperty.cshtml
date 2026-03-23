@@ -1,0 +1,161 @@
+@model Property
+@{
+    ViewBag.Title = "List New Property - Broker";
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4 style="margin: 0;"><i class="fas fa-plus"></i> List New Property</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Property Title</label>
+                                <input asp-for="PropertyTitle" class="form-control" required>
+                                <span asp-validation-for="PropertyTitle" class="invalid-feedback"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Property Type</label>
+                                <select asp-for="PropertyTypeId" class="form-select" required>
+                                    <option value="">Select Type</option>
+                                    @foreach (var type in ViewBag.PropertyTypes)
+                                    {
+                                        <option value="@type.PropertyTypeId">@type.TypeName</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="PropertyTypeId" class="invalid-feedback"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Locality</label>
+                                <select asp-for="LocalityId" class="form-select" required>
+                                    <option value="">Select Locality</option>
+                                    @foreach (var locality in ViewBag.Localities)
+                                    {
+                                        <option value="@locality.LocalityId">@locality.LocalityName</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="LocalityId" class="invalid-feedback"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Transaction Type</label>
+                                <select asp-for="TransactionType" class="form-select" required>
+                                    <option value="">Select Type</option>
+                                    <option value="0">Buy</option>
+                                    <option value="1">Sell</option>
+                                    <option value="2">Rent</option>
+                                </select>
+                                <span asp-validation-for="TransactionType" class="invalid-feedback"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Property Description</label>
+                            <textarea asp-for="PropertyDescription" class="form-control" rows="4" required></textarea>
+                            <span asp-validation-for="PropertyDescription" class="invalid-feedback"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Price (₹)</label>
+                                <input asp-for="PropertyPrice" type="number" class="form-control" required>
+                                <span asp-validation-for="PropertyPrice" class="invalid-feedback"></span>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Area</label>
+                                <input asp-for="PropertyArea" type="number" step="0.01" class="form-control" required>
+                                <span asp-validation-for="PropertyArea" class="invalid-feedback"></span>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Unit</label>
+                                <select asp-for="AreaUnit" class="form-select">
+                                    <option value="0">SqFt</option>
+                                    <option value="1">SqMeter</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Bedrooms</label>
+                                <input asp-for="Bedrooms" type="number" class="form-control">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Bathrooms</label>
+                                <input asp-for="Bathrooms" type="number" class="form-control">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Parking Spots</label>
+                                <input asp-for="Parking" type="number" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Furnishing</label>
+                                <select asp-for="Furnishing" class="form-select">
+                                    <option value="0">Unfurnished</option>
+                                    <option value="1">SemiFurnished</option>
+                                    <option value="2">Furnished</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Facing</label>
+                                <select asp-for="Facing" class="form-select">
+                                    <option value="0">North</option>
+                                    <option value="1">South</option>
+                                    <option value="2">East</option>
+                                    <option value="3">West</option>
+                                    <option value="4">NorthEast</option>
+                                    <option value="5">NorthWest</option>
+                                    <option value="6">SouthEast</option>
+                                    <option value="7">SouthWest</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Address</label>
+                            <input asp-for="Address" class="form-control" required>
+                            <span asp-validation-for="Address" class="invalid-feedback"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Landmark Description</label>
+                            <textarea asp-for="LandmarkDescription" class="form-control" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Property Features</label>
+                            <textarea asp-for="Features" class="form-control" rows="3" placeholder="e.g., Balcony, Garden, Security, etc."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Property Age (years)</label>
+                            <input asp-for="AgeOfProperty" type="number" class="form-control">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Main Image</label>
+                            <input type="file" name="mainImage" class="form-control" accept="image/*">
+                            <small class="text-muted">JPG, PNG (Max 5MB)</small>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-plus"></i> List Property
+                            </button>
+                            <a href="/Broker/Index" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

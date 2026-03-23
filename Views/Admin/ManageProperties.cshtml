@@ -1,0 +1,89 @@
+@model List<Property>
+@{
+    ViewBag.Title = "Manage Properties - Admin";
+}
+
+<div class="container py-5">
+    <h2 style="color: #B8956D; font-weight: bold; margin-bottom: 2rem;">
+        <i class="fas fa-building"></i> Manage Properties
+    </h2>
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Property Title</th>
+                    <th>Type</th>
+                    <th>Location</th>
+                    <th>Owner</th>
+                    <th>Status</th>
+                    <th>Verified</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var property in Model)
+                {
+                    <tr>
+                        <td>@property.PropertyTitle</td>
+                        <td>@property.PropertyType.TypeName</td>
+                        <td>@property.Locality.LocalityName</td>
+                        <td>@property.Owner?.FullName</td>
+                        <td>
+                            <span class="badge bg-@GetStatusColor(property.Status)">@property.Status</span>
+                        </td>
+                        <td>
+                            @if (property.IsVerified)
+                            {
+                                <span class="badge bg-success">Verified</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning">Pending</span>
+                            }
+                        </td>
+                        <td>₹@property.PropertyPrice.ToString("N0")</td>
+                        <td>
+                            @if (!property.IsVerified && property.Status == PropertyStatus.Pending)
+                            {
+                                <button class="btn btn-sm btn-success" onclick="approveProperty(@property.PropertyId)">
+                                    <i class="fas fa-check"></i> Approve
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="rejectProperty(@property.PropertyId)">
+                                    <i class="fas fa-times"></i> Reject
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-sm btn-@(property.Status == PropertyStatus.Active ? "danger" : "success")" 
+                                onclick="togglePropertyStatus(@property.PropertyId)">
+                            <i class="fas fa-@(property.Status == PropertyStatus.Active ? "ban" : "check")"></i> 
+                            @(property.Status == PropertyStatus.Active ? "Deactivate" : "Activate")
+                        </button>
+                            }
+                            <a href="/Home/PropertyDetails/@property.PropertyId" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@functions {
+    string GetStatusColor(PropertyStatus status)
+    {
+        return status switch
+        {
+            PropertyStatus.Active => "success",
+            PropertyStatus.Pending => "warning",
+            PropertyStatus.Inactive => "danger",
+            PropertyStatus.Sold => "info",
+            PropertyStatus.Rented => "primary",
+            _ => "secondary"
+        };
+    }
+}

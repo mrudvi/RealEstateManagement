@@ -1,0 +1,59 @@
+@model Locality
+@{
+    ViewBag.Title = "Edit Locality - Admin";
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-6 offset-lg-3">
+            <div class="card">
+                <div class="card-header">
+                    <h4 style="margin: 0;"><i class="fas fa-edit"></i> Edit Locality</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        <input type="hidden" name="LocalityId" value="@Model.LocalityId">
+
+                        <div class="mb-3">
+                            <label class="form-label">Locality Name</label>
+                            <input asp-for="LocalityName" class="form-control" required>
+                            <span asp-validation-for="LocalityName" class="invalid-feedback"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Area</label>
+                            <input asp-for="Area" class="form-control">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Zip Code</label>
+                            <input asp-for="ZipCode" class="form-control" pattern="[0-9]{6}">
+                            <small class="text-muted">6 digits</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" asp-for="IsActive" id="isActive">
+                                <label class="form-check-label" for="isActive">
+                                    Active
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> Update Locality
+                            </button>
+                            <a href="/Admin/ManageLocalities" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

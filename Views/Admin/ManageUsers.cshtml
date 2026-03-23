@@ -1,0 +1,100 @@
+@model List<User>
+@{
+    ViewBag.Title = "Manage Users - Admin";
+}
+
+<div class="container py-5">
+    <h2 style="color: #B8956D; font-weight: bold; margin-bottom: 2rem;">
+        <i class="fas fa-users"></i> Manage Users
+    </h2>
+
+    <!-- Filter -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row">
+                <div class="col-md-9">
+                    <label class="form-label">Filter by User Type</label>
+                    <select name="userType" class="form-select">
+                        <option value="">All Users</option>
+                        @foreach (var type in ViewBag.UserTypes)
+                        {
+                            <option value="@type">@type</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Type</th>
+                        <th>Verified</th>
+                        <th>Status</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <td>@user.FullName</td>
+                            <td>@user.Email</td>
+                            <td>@user.PhoneNumber</td>
+                            <td>
+                                <span class="badge bg-secondary">>@string.Join(", ", user.UserRoles.Select(r => r.Role.RoleName))</span>
+                            </td>
+                            <td>
+                                @if (user.IsVerified)
+                                {
+                                    <span class="badge bg-success"><i class="fas fa-check-circle"></i> Verified</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning">Not Verified</span>
+                                }
+                            </td>
+                            <td>
+                                @if (user.IsActive)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Inactive</span>
+                                }
+                            </td>
+                            <td>@user.CreatedDate.ToString("dd MMM yyyy")</td>
+                            <td>
+                                <button class="btn btn-sm btn-@(user.IsActive ? "danger" : "success")" onclick="toggleUserStatus(@user.UserId)">
+                                    <i class="fas fa-@(user.IsActive ? "ban" : "check")"></i> @(user.IsActive ? "Deactivate" : "Activate")
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> No users found.
+        </div>
+    }
+</div>

@@ -1,0 +1,286 @@
+@model User
+@{
+    ViewBag.Title = "Register - Real Estate Surat";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 style="margin: 0;"><i class="fas fa-user-plus"></i> Create Account</h4>
+                </div>
+                <div class="card-body">
+                    <form id="registerForm" method="post" action="/Auth/Register" enctype="multipart/form-data" novalidate>
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                        <div class="mb-3">
+                            <label class="form-label">User Type</label>
+                           <select asp-for="RoleId" class="form-control">
+                            <option value="">-- Select Role --</option>
+                            <option value="1">Customer / Owner</option>
+                            <option value="3">Broker</option>
+                            <option value="4">Builder</option>
+                        </select>
+                                                                            <span class="invalid-feedback"></span>
+                        </div>
+                        @* <div id="extraFields"></div> *@
+                        <!-- BROKER FIELDS -->
+                        <div id="brokerFields" style="display:none;">
+                            <hr>
+                            <h5>Broker Details</h5>
+
+                            <div class="mb-3">
+                                <label>Broker License Number</label>
+                                <input asp-for="BrokerLicenseNumber" class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label>License Upload</label>
+                                <input type="file" asp-for="LicenseFile" class="form-control">
+                            </div>
+
+                            <div class="mb-3">
+                                <label>ID Proof</label>
+                                <input type="file" asp-for="IdProofFile" class="form-control">
+                            </div>
+                        </div>
+
+                        <!-- BUILDER FIELDS -->
+                        <div id="builderFields" style="display:none;">
+                            <hr>
+                            <h5>Builder Details</h5>
+
+                            <div class="mb-3">
+                                <label>Company Name</label>
+                                <input asp-for="CompanyName" class="form-control">
+                            </div>
+                             <div class="mb-3">
+                            <label>RERA Number</label>
+                            <input asp-for="ReraNumber" class="form-control">
+                                <span asp-validation-for="ReraNumber" class="invalid-feedback"></span>
+
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Company Documents</label>
+                            <!-- IMPORTANT: file input -->
+                            <input type="file" name="CompanyDocumentsFile" class="form-control">
+                        </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">First Name</label>
+                                <input asp-for="FirstName" class="form-control" required>
+                                <span asp-validation-for="FirstName" class="invalid-feedback"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Last Name</label>
+                                <input asp-for="LastName" class="form-control" required>
+                                <span asp-validation-for="LastName" class="invalid-feedback"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            <input asp-for="Email" type="email" class="form-control" required>
+                            <span asp-validation-for="Email" class="invalid-feedback"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Phone Number (10 digits)</label>
+                            <input asp-for="PhoneNumber" type="tel" class="form-control" pattern="[0-9]{10}" required>
+                            <span asp-validation-for="PhoneNumber" class="invalid-feedback"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Streat Address</label>
+                            <input asp-for="Address" class="form-control" required>
+                            <span asp-validation-for="Address" class="invalid-feedback"></span>
+                        </div>
+                        <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">City</label>
+                            <input asp-for="City" class="form-control" required placeholder="e.g., Surat">
+                            <span asp-validation-for="City" class="invalid-feedback"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">State</label>
+                            <input asp-for="State" class="form-control" required placeholder="e.g., Gujarat">
+                            <span asp-validation-for="State" class="invalid-feedback"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Country</label>
+                            <input asp-for="Country" class="form-control" required placeholder="e.g., India">
+                            <span asp-validation-for="Country" class="invalid-feedback"></span>
+                        </div>
+                    </div>
+                        <div class="mb-3">
+                        <label class="form-label">Profile Image</label>
+                        <input asp-for="ProfileImageFile" type="file" class="form-control">
+<span asp-validation-for="ProfileImageFile" class="invalid-feedback"></span>
+                    </div>
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+<input asp-for="Password" type="password" class="form-control" required>                            <small class="form-text text-muted">Minimum 6 characters</small>
+                            <span asp-validation-for="Password" class="invalid-feedback"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                                <label class="form-check-label" for="agreeTerms">
+                                    I agree to the Terms & Conditions
+                                </label>
+                            </div>
+                        </div>
+
+<button type="submit" class="btn btn-primary w-100 mb-3">                          <i class="fas fa-user-plus"></i> Create Account
+                        </button>
+
+                        <div class="text-center">
+                            <p>Already have an account? <a href="/Auth/Login">Login here</a></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+window.onload = function () {
+
+    const form = document.getElementById("registerForm");
+    const userTypeSelect = document.getElementById("RoleId");
+    const brokerFields = document.getElementById("brokerFields");
+    const builderFields = document.getElementById("builderFields");
+
+    userTypeSelect.addEventListener("change", function () {
+
+        const value = this.value;
+
+        brokerFields.style.display = "none";
+        builderFields.style.display = "none";
+
+        if (value === "3") {
+            brokerFields.style.display = "block";
+        }
+
+        if (value === "4") {
+            builderFields.style.display = "block";
+        }
+    });
+
+    if (form) {
+        form.addEventListener("submit", function (e) {
+
+            if (!form.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            form.classList.add("was-validated");
+        });
+    }
+};
+</script>
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

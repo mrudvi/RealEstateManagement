@@ -1,0 +1,75 @@
+@model List<SiteVisit>
+@{
+    ViewBag.Title = "Manage Site Visits - Broker";
+}
+
+<div class="container py-5">
+    <h2 style="color: #B8956D; font-weight: bold; margin-bottom: 2rem;">
+        <i class="fas fa-calendar"></i> Manage Site Visits
+    </h2>
+
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Property</th>
+                        <th>Scheduled Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var visit in Model)
+                    {
+                        <tr>
+                            <td>@visit.Customer?.FullName</td>
+                            <td>@visit.Property?.PropertyTitle</td>
+                            <td>@visit.ScheduledDate.ToString("dd MMM yyyy")</td>
+                            <td>@visit.ScheduledTime</td>
+                            <td>
+                                <span class="badge bg-@GetStatusColor(visit.VisitStatus)">@visit.VisitStatus</span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-info" onclick="updateVisitStatus(@visit.VisitId, 'Completed')">
+                                        <i class="fas fa-check"></i> Complete
+                                    </button>
+                                    <button class="btn btn-warning" onclick="updateVisitStatus(@visit.VisitId, 'NoShow')">
+                                        <i class="fas fa-times"></i> No Show
+                                    </button>
+                                    <button class="btn btn-danger" onclick="updateVisitStatus(@visit.VisitId, 'Cancelled')">
+                                        <i class="fas fa-ban"></i> Cancel
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> No site visits scheduled.
+        </div>
+    }
+</div>
+
+@functions {
+    string GetStatusColor(VisitStatus status)
+    {
+        return status switch
+        {
+            VisitStatus.Scheduled => "info",
+            VisitStatus.Completed => "success",
+            VisitStatus.Cancelled => "danger",
+            VisitStatus.NoShow => "warning",
+            _ => "secondary"
+        };
+    }
+}

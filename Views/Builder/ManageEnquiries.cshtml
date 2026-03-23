@@ -1,0 +1,125 @@
+@model List<Enquiry>
+@{
+    ViewBag.Title = "Manage Enquiries - Builder";
+}
+
+<div class="container py-5">
+    <h2 style="color: #B8956D; font-weight: bold; margin-bottom: 2rem;">
+        <i class="fas fa-envelope"></i> Manage Project Enquiries
+    </h2>
+
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Project</th>
+                        <th>Message</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var enquiry in Model)
+                    {
+                        <tr>
+                            <td>@enquiry.Customer?.FullName</td>
+                            <td>@enquiry.Property?.PropertyTitle</td>
+                            <td>@enquiry.EnquiryMessage.Substring(0, Math.Min(30, enquiry.EnquiryMessage.Length))...</td>
+                            <td>
+                                <span class="badge bg-@GetStatusColor(enquiry.EnquiryStatus)">@enquiry.EnquiryStatus</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-@GetPriorityColor(enquiry.Priority)">@enquiry.Priority</span>
+                            </td>
+                            <td>@enquiry.CreatedDate.ToString("dd MMM yyyy")</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#details_@enquiry.EnquiryId">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Details Modal -->
+                        <div class="modal fade" id="details_@enquiry.EnquiryId" tabindex="-1">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Enquiry Details</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p><strong>Customer:</strong> @enquiry.Customer?.FullName</p>
+                                        <p><strong>Phone:</strong> @enquiry.Customer?.PhoneNumber</p>
+                                        <p><strong>Email:</strong> @enquiry.Customer?.Email</p>
+                                        <p><strong>Project:</strong> @enquiry.Property?.PropertyTitle</p>
+                                        <hr>
+                                        <p><strong>Message:</strong></p>
+                                        <p>@enquiry.EnquiryMessage</p>
+
+                                        @if (enquiry.Responses.Count > 0)
+                                        {
+                                            <hr>
+                                            <p><strong>Responses:</strong></p>
+                                            @foreach (var response in enquiry.Responses)
+                                            {
+                                                <div class="bg-light p-2 rounded mb-2">
+                                                    <small><strong>@response.RespondedByUser?.FullName</strong></small>
+                                                    <p>@response.ResponseMessage</p>
+                                                </div>
+                                            }
+                                        }
+
+                                        <textarea id="responseMessage_@enquiry.EnquiryId" class="form-control mt-3" rows="3" placeholder="Write your response..."></textarea>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-primary" onclick="respondToEnquiry(@enquiry.EnquiryId)">
+                                            <i class="fas fa-paper-plane"></i> Send Response
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> No enquiries received yet.
+        </div>
+    }
+</div>
+
+@functions {
+    string GetStatusColor(EnquiryStatus status)
+    {
+        return status switch
+        {
+            EnquiryStatus.New => "info",
+            EnquiryStatus.InProgress => "warning",
+            EnquiryStatus.Contacted => "primary",
+            EnquiryStatus.Closed => "success",
+            EnquiryStatus.Rejected => "danger",
+            _ => "secondary"
+        };
+    }
+
+    string GetPriorityColor(Priority priority)
+    {
+        return priority switch
+        {
+            Priority.Low => "info",
+            Priority.Medium => "warning",
+            Priority.High => "danger",
+            _ => "secondary"
+        };
+    }
+}

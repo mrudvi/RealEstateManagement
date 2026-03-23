@@ -1,0 +1,60 @@
+@model List<Favorite>
+@{
+    ViewBag.Title = "My Favorites - Customer";
+}
+
+<div class="container py-5">
+    <h2 style="color: #B8956D; font-weight: bold; margin-bottom: 2rem;">
+        <i class="fas fa-heart"></i> My Favorite Properties
+    </h2>
+
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="row">
+            @foreach (var favorite in Model)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card property-card">
+                        <div style="position: relative;">
+                            <img src="@favorite.Property?.MainImage" alt="@favorite.Property?.PropertyTitle" class="property-image">
+                            <span class="property-badge">₹@favorite.Property?.PropertyPrice.ToString("N0")</span>
+                        </div>
+                        <div class="property-details">
+                            <h5 class="property-title">@favorite.Property?.PropertyTitle</h5>
+                            <div class="property-locality">
+                                <i class="fas fa-map-marker-alt"></i> @favorite.Property?.Locality.LocalityName
+                            </div>
+                            <div class="property-specs">
+                                <div class="property-spec">
+                                    <i class="fas fa-ruler"></i> @favorite.Property?.PropertyArea @favorite.Property?.AreaUnit
+                                </div>
+                                @if (favorite.Property?.Bedrooms > 0)
+                                {
+                                    <div class="property-spec">
+                                        <i class="fas fa-bed"></i> @favorite.Property?.Bedrooms BHK
+                                    </div>
+                                }
+                            </div>
+                            <div class="mt-2">
+                                <a href="/Home/PropertyDetails/@favorite.Property?.PropertyId" class="btn btn-sm btn-primary me-2 flex-grow-1">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                                <button type="button" class="btn btn-sm btn-danger" onclick="removeFavorite(@favorite.Property?.PropertyId)">
+                                    <i class="fas fa-trash"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center py-5">
+            <i class="fas fa-heart-broken" style="font-size: 3rem;"></i>
+            <p class="mt-3">You haven't added any favorites yet.</p>
+            <a href="/Home/Search" class="btn btn-primary">Search Properties</a>
+        </div>
+    }
+</div>

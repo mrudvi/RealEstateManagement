@@ -1,0 +1,55 @@
+@model dynamic
+
+<h3>Pending Approvals</h3>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>License</th>
+            <th>ID Proof</th>
+            <th>Company Doc</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.User.FullName</td>
+            <td>@item.Type</td>
+
+            <td>
+                @if (!string.IsNullOrEmpty(item.License))
+                {
+                    <a href="@item.License" target="_blank">View</a>
+                }
+            </td>
+
+            <td>
+                @if (!string.IsNullOrEmpty(item.IdProof))
+                {
+                    <a href="@item.IdProof" target="_blank">View</a>
+                }
+            </td>
+
+            <td>
+                @if (item.Type == "Builder" && !string.IsNullOrEmpty(item.CompanyDoc))
+                {
+                    <a href="@item.CompanyDoc" target="_blank">View Document</a>                }
+                else
+                {
+                    <span>-</span>
+                }
+            </td>
+
+            <td>
+
+            <a href="/Admin/ApproveUser/@item.User.UserId" class="btn btn-success btn-sm">Approve</a>
+            <a href="/Admin/RejectUser/@item.User.UserId" class="btn btn-danger btn-sm">Reject</a>            </td>
+        </tr>
+    }
+    </tbody>
+</table>

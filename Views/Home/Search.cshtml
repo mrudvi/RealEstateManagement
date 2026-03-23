@@ -1,0 +1,140 @@
+@model List<Property>
+@{
+    ViewBag.Title = "Search Properties - Real Estate Surat";
+}
+
+<div class="container py-5">
+    <h2 style="color: #B8956D; font-weight: bold; margin-bottom: 2rem;">
+        <i class="fas fa-search"></i> Search Results
+    </h2>
+
+    <!-- Filter Card -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 style="margin: 0;"><i class="fas fa-filter"></i> Filters</h5>
+        </div>
+        <div class="card-body">
+            <form action="/Home/Search" method="get">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Location / Locality</label>
+                        <input type="text" name="locality" class="form-control"
+                               placeholder="Enter locality" 
+                               value="@ViewContext.HttpContext.Request.Query["locality"]">
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Property Type</label>
+                        <select name="propertyType" class="form-select">
+                            <option value="">All Types</option>
+                            @foreach (var type in ViewBag.PropertyTypes)
+                            {
+                                <option value="@type.TypeName"
+                                        selected="@(ViewContext.HttpContext.Request.Query["propertyType"] == type.TypeName ? "selected" : null)">
+                                    @type.TypeName
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Min Price (₹)</label>
+                        <input type="number" name="minPrice" class="form-control"
+                               placeholder="Min" value="@ViewContext.HttpContext.Request.Query["minPrice"]">
+                    </div>
+
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Max Price (₹)</label>
+                        <input type="number" name="maxPrice" class="form-control"
+                               placeholder="Max" value="@ViewContext.HttpContext.Request.Query["maxPrice"]">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Transaction Type</label>
+                        <select name="transactionType" class="form-select">
+                            <option value="">All Types</option>
+                            <option value="Buy" selected="@(ViewContext.HttpContext.Request.Query["transactionType"] == "Buy" ? "selected" : null)">Buy</option>
+                            <option value="Sell" selected="@(ViewContext.HttpContext.Request.Query["transactionType"] == "Sell" ? "selected" : null)">Sell</option>
+                            <option value="Rent" selected="@(ViewContext.HttpContext.Request.Query["transactionType"] == "Rent" ? "selected" : null)">Rent</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-9 mb-3">
+                        <label class="form-label">&nbsp;</label>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results -->
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="row mb-3">
+            <div class="col-12">
+                <p style="color: var(--text-light);">Found <strong>@Model.Count</strong> properties matching your criteria</p>
+            </div>
+        </div>
+
+        <div class="row">
+            @foreach (var property in Model.Where(p => p != null))
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card property-card">
+                        <div style="position: relative;">
+                            <img src="@property!.MainImage" alt="@property.PropertyTitle" class="property-image">
+                            <span class="property-badge">
+                                @if (property.TransactionType == TransactionType.Rent)
+                                {
+                                    <span>₹@property.PropertyPrice/mo</span>
+                                }
+                                else
+                                {
+                                    <span>₹@property.PropertyPrice.ToString("N0")</span>
+                                }
+                            </span>
+                        </div>
+                        <div class="property-details">
+                            <h5 class="property-title">@property.PropertyTitle</h5>
+                            <div class="property-locality">
+                                <i class="fas fa-map-marker-alt"></i> @property.Locality?.LocalityName ?? "N/A"
+                            </div>
+                            <div class="property-specs">
+                                <div class="property-spec">
+                                    <i class="fas fa-ruler"></i> @property.PropertyArea @property.AreaUnit
+                                </div>
+                                @if (property.Bedrooms > 0)
+                                {
+                                    <div class="property-spec">
+                                        <i class="fas fa-bed"></i> @property.Bedrooms BHK
+                                    </div>
+                                }
+                            </div>
+                            <p class="text-muted small">
+                                @(property.PropertyDescription != null 
+                                    ? property.PropertyDescription.Substring(0, Math.Min(80, property.PropertyDescription.Length)) + "..."
+                                    : "")
+                            </p>
+                            <a href="/Home/PropertyDetails/@property.PropertyId" class="btn btn-primary w-100">
+                                <i class="fas fa-eye"></i> View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center py-5">
+            <i class="fas fa-info-circle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+            <p>No properties found matching your criteria. Please try different filters.</p>
+            <a href="/Home/Search" class="btn btn-primary">Reset Filters</a>
+        </div>
+    }
+</div>

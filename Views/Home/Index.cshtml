@@ -1,0 +1,186 @@
+﻿@{
+    ViewBag.Title = "Home - Real Estate Surat";
+}
+@model List<RealEstateManagement.Models.Property>
+
+<!-- Hero Section -->
+<section class="hero-section" style="background: linear-gradient(135deg, #D4A574 0%, #B8956D 100%); color: white; padding: 6rem 0; text-align: center;">
+    <div class="container">
+        <h1 style="font-size: 3rem; font-weight: bold; margin-bottom: 1rem;">
+            <i class="fas fa-home"></i> Find Your Dream Property in Surat
+        </h1>
+        <p style="font-size: 1.25rem; margin-bottom: 2rem;">
+            Discover the best properties for buying, selling, and renting in Surat city
+        </p>
+        <a href="/Home/Search" class="btn btn-light btn-lg">
+            <i class="fas fa-search"></i> Start Searching
+        </a>
+    </div>
+</section>
+
+<!-- Search Section -->
+<section class="py-5" style="background-color: #F5F1E8;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <form action="/Home/Search" method="get" class="card p-4">
+                    <h4 class="mb-4"><i class="fas fa-filter"></i> Quick Search</h4>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Location / Locality</label>
+                            <input type="text" name="locality" class="form-control" placeholder="Enter locality">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Property Type</label>
+                            <select name="propertyType" class="form-select">
+                                <option value="">All Types</option>
+                                <option value="Apartment">Apartment</option>
+                                <option value="House">House</option>
+                                <option value="Plot">Plot</option>
+                                <option value="Commercial">Commercial</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Transaction Type</label>
+                            <select name="transactionType" class="form-select">
+                                <option value="">All Types</option>
+                                <option value="Buy">Buy</option>
+                                <option value="Sell">Sell</option>
+                                <option value="Rent">Rent</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <button type="submit" class="btn btn-primary w-100 mt-4">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5" style="color: #B8956D; font-weight: bold;">Why Choose Us?</h2>
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="stat-card">
+                    <i class="fas fa-building" style="font-size: 2.5rem;"></i>
+                    <div class="stat-number">@ViewBag.TotalProperties</div>
+                    <div class="stat-label">Active Properties</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stat-card" style="background: linear-gradient(135deg, #8B7355 0%, #6B5744 100%);">
+                    <i class="fas fa-users" style="font-size: 2.5rem;"></i>
+                    <div class="stat-number">@ViewBag.TotalUsers</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stat-card" style="background: linear-gradient(135deg, #D4A574 0%, #B8956D 100%);">
+                    <i class="fas fa-check-circle" style="font-size: 2.5rem;"></i>
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Verified Listings</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stat-card" style="background: linear-gradient(135deg, #8B7355 0%, #6B5744 100%);">
+                    <i class="fas fa-headset" style="font-size: 2.5rem;"></i>
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Support</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Properties -->
+<!-- Featured Properties -->
+<section class="py-5" style="background-color: #F5F1E8;">
+    <div class="container">
+        <h2 class="text-center mb-5" style="color: #B8956D; font-weight: bold;">Featured Properties</h2>
+        <div class="row">
+            @if (Model != null && Model.Count > 0)
+            {
+                @foreach (var property in Model.Where(p => p != null))
+                {
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card property-card">
+                            <div style="position: relative;">
+                                <img src="@property!.MainImage" alt="@property.PropertyTitle" class="property-image">
+                                <span class="property-badge">₹@property.PropertyPrice.ToString("N0")</span>
+                            </div>
+                            <div class="property-details">
+                                <h5 class="property-title">@property.PropertyTitle</h5>
+                                <div class="property-locality">
+                                    <i class="fas fa-map-marker-alt"></i> @property.Locality?.LocalityName ?? "N/A"
+                                </div>
+                                <div class="property-specs">
+                                    <div class="property-spec">
+                                        <i class="fas fa-ruler"></i> @property.PropertyArea @property.AreaUnit
+                                    </div>
+                                    @if (property.Bedrooms > 0)
+                                    {
+                                        <div class="property-spec">
+                                            <i class="fas fa-bed"></i> @property.Bedrooms BHK
+                                        </div>
+                                    }
+                                </div>
+                                <p class="text-muted small">
+                                    @(property.PropertyDescription != null 
+                                        ? property.PropertyDescription.Substring(0, Math.Min(100, property.PropertyDescription.Length)) + "..."
+                                        : "")
+                                </p>
+                                <a href="/Home/PropertyDetails/@property.PropertyId" class="btn btn-primary w-100">
+                                    <i class="fas fa-eye"></i> View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12">
+                    <p class="text-center">No properties available at the moment.</p>
+                </div>
+            }
+        </div>
+        <div class="text-center mt-4">
+            <a href="/Home/Search" class="btn btn-primary btn-lg">View All Properties</a>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5" style="background: linear-gradient(135deg, #D4A574 0%, #B8956D 100%); color: white;">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h2 style="font-weight: bold;">Ready to Find Your Dream Property?</h2>
+                <p style="margin-top: 1rem; font-size: 1.1rem;">Join thousands of satisfied customers in Surat</p>
+            </div>
+            <div class="col-md-6 text-center">
+                @if (ViewBag.IsLoggedIn == false)
+{
+    <a href="/Auth/Register" class="btn btn-light btn-lg mx-2">
+        <i class="fas fa-user-plus"></i> Register Now
+    </a>
+    <a href="/Auth/Login" class="btn btn-outline-light btn-lg mx-2">
+        <i class="fas fa-sign-in-alt"></i> Login
+    </a>
+}
+else
+{
+    <a href="/Home/Search" class="btn btn-light btn-lg">
+        <i class="fas fa-search"></i> Continue Searching
+    </a>
+}
+            </div>
+        </div>
+    </div>
+</section>

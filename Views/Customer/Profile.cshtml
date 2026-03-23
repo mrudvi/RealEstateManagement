@@ -1,0 +1,60 @@
+@model User
+@{
+    ViewBag.Title = "My Profile - Customer";
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4 style="margin: 0;"><i class="fas fa-user-circle"></i> My Profile</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="/Customer/UpdateProfile">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">First Name</label>
+                                <input type="text" name="FirstName" class="form-control" value="@Model.FirstName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" name="LastName" class="form-control" value="@Model.LastName" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-control" value="@Model.Email" disabled>
+                            <small class="text-muted">Email cannot be changed</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" name="PhoneNumber" class="form-control" value="@Model.PhoneNumber" pattern="[0-9]{10}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Address</label>
+                            <input type="text" name="Address" class="form-control" value="@Model.Address">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">User Type</label>
+                            <input type="text" class="form-control" value="@string.Join(", ", Model.UserRoles.Select(r => r.Role.RoleName))" disabled>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Joined Date</label>
+                            <input type="text" class="form-control" value="@Model.CreatedDate.ToString("dd MMM yyyy")" disabled>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Update Profile
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
