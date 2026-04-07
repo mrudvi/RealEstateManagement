@@ -107,6 +107,8 @@ namespace RealEstateManagement.Models
 
         [ForeignKey("BudderId")]
         public virtual User? Budder { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
 
         public ICollection<Propertyimage> PropertyImages { get; set; } = new List<Propertyimage>();
         public ICollection<Enquiry> Enquiry { get; set; } = new List<Enquiry>();

@@ -34,6 +34,20 @@ namespace RealEstateManagement.Controllers
             }
             return true;
         }
+        [HttpGet]
+        public async Task<IActionResult> SearchLocation(string query)
+        {
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("User-Agent", "RealEstateApp");
+
+                var url = $"https://nominatim.openstreetmap.org/search?format=json&q={query}+surat&limit=5";
+
+                var response = await client.GetStringAsync(url);
+
+                return Content(response, "application/json");
+            }
+        }
 
         public IActionResult Index()
         {

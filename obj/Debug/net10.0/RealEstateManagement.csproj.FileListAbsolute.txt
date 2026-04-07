@@ -171,3 +171,11 @@ C:\laragon\www\aspdotnet\RealEstateManagement\obj\Debug\net10.0\RealEstateManage
 C:\laragon\www\aspdotnet\RealEstateManagement\obj\Debug\net10.0\RealEstateManagement.genruntimeconfig.cache
 C:\laragon\www\aspdotnet\RealEstateManagement\obj\Debug\net10.0\ref\RealEstateManagement.dll
 C:\laragon\www\aspdotnet\RealEstateManagement\obj\Debug\net10.0\compressed\twicy6cagb-{0}-hepd0ki23g-hepd0ki23g.gz
+C:\laragon\www\aspdotnet\RealEstateManagement\obj\Debug\net10.0\RealEstateManagement.sourcelink.json
+C:\laragon\www\aspdotnet\RealEstateManagement\obj\Debug\net10.0\compressed\f5p1mqlzvx-{0}-in6jj3e4kb-in6jj3e4kb.gz
+C:\laragon\www\aspdotnet\RealEstateManagement\obj\Debug\net10.0\compressed\1kwnago363-{0}-jlhumrsmn6-jlhumrsmn6.gz
+C:\laragon\www\aspdotnet\RealEstateManagement\obj\Debug\net10.0\compressed\jtczt2qjy8-{0}-9qvfxtz8cu-9qvfxtz8cu.gz
+C:\laragon\www\aspdotnet\RealEstateManagement\obj\Debug\net10.0\compressed\1t76ypk3kr-{0}-fyopx3gvnc-fyopx3gvnc.gz
+C:\laragon\www\aspdotnet\RealEstateManagement\obj\Debug\net10.0\compressed\jjcra22piv-{0}-7888sfn8yc-7888sfn8yc.gz
+C:\laragon\www\aspdotnet\RealEstateManagement\obj\Debug\net10.0\compressed\ia0mvu2lfj-{0}-b4adnknggc-b4adnknggc.gz
+C:\laragon\www\aspdotnet\RealEstateManagement\obj\Debug\net10.0\compressed\xhjeof0c2s-{0}-w4n1b1xhjx-w4n1b1xhjx.gz

@@ -2,6 +2,44 @@
 @{
     ViewBag.Title = "List New Property - Broker";
 }
+<style>
+#map {
+    z-index: 1;
+    position: relative;
+}
+
+.address-container {
+    position: relative;
+}
+
+/* Suggestions DROPDOWN */
+#suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: white;
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    z-index: 9999;
+    display: none; /* 🔥 ADD THIS */
+}
+
+#suggestions.active {
+    display: block;
+}
+
+/* Hide when empty */
+#suggestions:empty {
+    display: none;
+}
+
+/* Map stays below */
+#map {
+    z-index: 1;
+}
+</style>
 
 <div class="container py-5">
     <div class="row">
@@ -120,11 +158,25 @@
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Address</label>
-                            <input asp-for="Address" class="form-control" required>
-                            <span asp-validation-for="Address" class="invalid-feedback"></span>
+                       <div class="mb-3">
+    <label class="form-label">Address</label>
+
+                        <!-- NEW WRAPPER -->
+                        <div class="address-container">
+                            <input id="addressInput" asp-for="Address" class="form-control" placeholder="Enter location in Surat" required>
+
+                            <div id="suggestions"></div>
                         </div>
+
+                        <!-- Hidden fields -->
+                        <input type="hidden" id="Latitude" name="Latitude" />
+                        <input type="hidden" id="Longitude" name="Longitude" />
+
+                        <!-- Map -->
+                        <div id="map" style="height: 300px; margin-top:10px;"></div>
+
+                        <span asp-validation-for="Address" class="invalid-feedback"></span>
+                    </div>
 
                         <div class="mb-3">
                             <label class="form-label">Landmark Description</label>
@@ -159,3 +211,154 @@
         </div>
     </div>
 </div>
+<script src="/leaflet/leaflet.js"></script>
+<script>
+var map;
+var marker;
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    // Init map
+    map = L.map('map').setView([21.1702, 72.8311], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    var bounds = L.latLngBounds(
+        [21.10, 72.70],
+        [21.30, 72.90]
+    );
+    map.setMaxBounds(bounds);
+    map.on('click', function (e) {
+
+    let lat = e.latlng.lat;
+    let lon = e.latlng.lng;
+
+    // Surat bounds check
+    let isInSurat =
+        lat >= 21.10 && lat <= 21.30 &&
+        lon >= 72.70 && lon <= 72.90;
+
+    if (!isInSurat) {
+        alert("Please select a location within Surat only ❌");
+        return;
+    }
+
+    let location = L.latLng(lat, lon);
+
+    map.setView(location, 15);
+
+    if (marker) {
+        map.removeLayer(marker);
+    }
+
+    marker = L.marker(location).addTo(map);
+
+    // Save values
+    document.getElementById("Latitude").value = lat;
+    document.getElementById("Longitude").value = lon;
+
+    console.log("Map Click:", lat, lon);
+});
+    // SEARCH INPUT
+    let input = document.getElementById("addressInput");
+    let suggestionBox = document.getElementById("suggestions");
+
+    input.addEventListener("keyup", function () {
+
+        let query = input.value;
+
+        if (query.length < 3) {
+    suggestionBox.innerHTML = "";
+    suggestionBox.classList.remove("active"); // 🔥
+    return;
+}
+
+fetch(`/Broker/SearchLocation?query=${query}`)
+.then(res => res.json())
+.then(data => {
+
+    suggestionBox.innerHTML = "";
+
+    if (data.length === 0) {
+        suggestionBox.classList.remove("active");
+        return;
+    }
+
+    suggestionBox.classList.add("active"); // 🔥
+
+    data.forEach(place => {
+
+        let div = document.createElement("div");
+        div.innerText = place.display_name;
+
+        div.onclick = function () {
+
+            let lat = parseFloat(place.lat);
+            let lon = parseFloat(place.lon);
+
+            let location = L.latLng(lat, lon);
+
+            map.setView(location, 15);
+
+            if (marker) map.removeLayer(marker);
+
+            marker = L.marker(location).addTo(map);
+
+            input.value = place.display_name;
+            document.getElementById("Latitude").value = lat;
+            document.getElementById("Longitude").value = lon;
+
+            suggestionBox.innerHTML = "";
+            suggestionBox.classList.remove("active"); // 🔥 IMPORTANT
+        };
+
+        suggestionBox.appendChild(div);
+    });
+
+});
+    });
+
+});
+</script>
+<script>
+document.getElementById("addressInput").addEventListener("change", function() {
+
+    let query = this.value;
+
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
+        .then(res => res.json())
+        .then(data => {
+
+            if (data.length > 0) {
+
+                let lat = parseFloat(data[0].lat);
+                let lon = parseFloat(data[0].lon);
+
+                // Surat bounds
+                let isInSurat =
+                    lat >= 21.10 && lat <= 21.30 &&
+                    lon >= 72.70 && lon <= 72.90;
+
+                if (!isInSurat) {
+                    alert("Please select a location within Surat only ❌");
+                    return;
+                }
+
+                let location = L.latLng(lat, lon);
+
+                map.setView(location, 15);
+
+                if (marker) {
+                    map.removeLayer(marker);
+                }
+
+                marker = L.marker(location).addTo(map);
+
+                document.getElementById("Latitude").value = lat;
+                document.getElementById("Longitude").value = lon;
+            }
+        });
+});
+</script>
