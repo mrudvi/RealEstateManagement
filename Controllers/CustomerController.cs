@@ -249,7 +249,8 @@ namespace RealEstateManagement.Controllers
                 PropertyId = propertyId,
                 CustomerId = userId,
                 ScheduledDate = scheduledDate,
-                ScheduledTime = visitTime,
+                ScheduledTime = TimeSpan.Parse(visitTime)
+,
                 VisitStatus = VisitStatus.Scheduled,
                 CreatedDate = DateTime.Now,
                 UpdatedDate = DateTime.Now

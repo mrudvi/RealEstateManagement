@@ -77,8 +77,8 @@
                     {
                         <tr>
                             <td>@property.PropertyTitle</td>
-                            <td>@property.PropertyType.TypeName</td>
-                            <td>@property.Locality.LocalityName</td>
+                            <td>@(property.PropertyType?.TypeName ?? "N/A")</td>
+                            <td>@(property.Locality?.LocalityName ?? "N/A")</td>
                             <td>₹@property.PropertyPrice.ToString("N0")</td>
                             <td>
                                 <span class="badge bg-@GetStatusColor(property.Status)">@property.Status</span>

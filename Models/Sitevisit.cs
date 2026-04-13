@@ -18,8 +18,7 @@ namespace RealEstateManagement.Models
         [Required(ErrorMessage = "Scheduled Date is required")]
         public DateTime ScheduledDate { get; set; }
 
-        [StringLength(10)]
-        public required string ScheduledTime { get; set; }
+        public TimeSpan ScheduledTime { get; set; }
 
         public VisitStatus VisitStatus { get; set; } = VisitStatus.Scheduled;
 
@@ -41,7 +40,6 @@ namespace RealEstateManagement.Models
 
         [ForeignKey("ScheduledBy")]
         public virtual User? ScheduledByUser { get; set; }
-        public virtual User? ScheduledByNavigation { get; set; }
     }
 
     public enum VisitStatus

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using RealEstateManagement.Models;
 using System.Linq;
 using System.IO;
+using Microsoft.EntityFrameworkCore;
 
 namespace RealEstateManagement.Controllers
 {
@@ -93,7 +94,7 @@ namespace RealEstateManagement.Controllers
             {
                 return RedirectToAction("Login", "Auth");
             }
-
+            ViewBag.Owners = _context.Users.Where(u => u.IsActive).ToList(); // 🔥 ADD THIS
             ViewBag.PropertyTypes = _context.Propertytypes.Where(pt => pt.IsActive).ToList();
             ViewBag.Localities = _context.Localities.Where(l => l.IsActive).ToList();
 
@@ -108,12 +109,15 @@ namespace RealEstateManagement.Controllers
                 return RedirectToAction("Login", "Auth");
             }
 
-            if (!ModelState.IsValid)
-            {
-                ViewBag.PropertyTypes = _context.Propertytypes.Where(pt => pt.IsActive).ToList();
-                ViewBag.Localities = _context.Localities.Where(l => l.IsActive).ToList();
-                return View(model);
-            }
+            // if (!ModelState.IsValid)
+            // {
+            //     ModelState.Clear();   // 🔥 ADD THIS LINE
+
+            //     ViewBag.Owners = _context.Users.Where(u => u.IsActive).ToList();
+            //     ViewBag.PropertyTypes = _context.Propertytypes.Where(pt => pt.IsActive).ToList();
+            //     ViewBag.Localities = _context.Localities.Where(l => l.IsActive).ToList();
+            //     return View(model);
+            // }
 
             int userId = GetUserId();
             model.BrokerId = userId;
@@ -121,6 +125,7 @@ namespace RealEstateManagement.Controllers
             model.CreatedDate = DateTime.Now;
             model.UpdatedDate = DateTime.Now;
 
+            //one image path inside properties table
             if (mainImage != null && mainImage.Length > 0)
             {
                 string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "uploads", "properties");
@@ -139,6 +144,59 @@ namespace RealEstateManagement.Controllers
 
             _context.Properties.Add(model);
             _context.SaveChanges();
+
+            // SAVE IMAGES into propertyimage table
+            var images = Request.Form.Files.Where(f => f.Name == "images");
+
+            foreach (var image in images)
+            {
+                if (image.Length > 0)
+                {
+                    string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "uploads", "images");
+                    Directory.CreateDirectory(uploadsFolder);
+
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+                    string filePath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        image.CopyTo(stream);
+                    }
+
+                    var propertyImage = new Propertyimage
+                    {
+                        PropertyId = model.PropertyId,
+                        ImagePath = "uploads/images/" + fileName,
+                        IsPrimary = false
+                    };
+
+                    _context.Propertyimages.Add(propertyImage);
+                }
+            }
+            // ✅ SAVE VIDEO into propertyvideo table
+            var video = Request.Form.Files.FirstOrDefault(f => f.Name == "video");
+
+            if (video != null && video.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "uploads", "videos");
+                Directory.CreateDirectory(uploadsFolder);
+
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(video.FileName);
+                string filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    video.CopyTo(stream);
+                }
+
+                var propertyVideo = new Propertyvideo
+                {
+                    PropertyId = model.PropertyId,
+                    VideoPath = "uploads/videos/" + fileName
+                };
+
+                _context.PropertyVideos.Add(propertyVideo);
+            }
 
             LogActivity(userId, "Property Added", "Property", model.PropertyId, $"Property '{model.PropertyTitle}' added by broker");
 
@@ -220,10 +278,13 @@ namespace RealEstateManagement.Controllers
             }
 
             int userId = GetUserId();
+
             var visits = _context.Sitevisits
-    .Where(sv => sv.Property != null && sv.Property.BrokerId == userId)
-    .OrderByDescending(sv => sv.ScheduledDate)
-    .ToList();
+                .Include(sv => sv.Property)   // optional but useful
+                .Include(sv => sv.Customer)   // who booked
+                .Where(sv => sv.ScheduledBy == userId)  // ✅ FIXED
+                .OrderByDescending(sv => sv.ScheduledDate)
+                .ToList();
 
             return View(visits);
         }

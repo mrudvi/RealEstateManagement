@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RealEstateManagement.Models;
 using System.Linq;
 
@@ -220,8 +221,11 @@ namespace RealEstateManagement.Controllers
             }
 
             var properties = _context.Properties
-                .OrderByDescending(p => p.CreatedDate)
-                .ToList();
+         .Include(p => p.PropertyType)
+         .Include(p => p.Owner)
+         .Include(p => p.Locality)
+         .OrderByDescending(p => p.CreatedDate)
+         .ToList();
 
             return View(properties);
         }

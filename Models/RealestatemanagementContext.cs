@@ -33,7 +33,7 @@ public partial class RealestatemanagementContext : DbContext
     public virtual DbSet<Property> Properties { get; set; }
 
     public virtual DbSet<Propertyimage> Propertyimages { get; set; }
-
+    public DbSet<Propertyvideo> PropertyVideos { get; set; }
     public virtual DbSet<Propertytype> Propertytypes { get; set; }
 
     public virtual DbSet<SiteVisit> Sitevisits { get; set; }
@@ -405,9 +405,10 @@ public partial class RealestatemanagementContext : DbContext
                 .HasForeignKey(d => d.PropertyId)
                 .HasConstraintName("sitevisits_ibfk_1");
 
-            entity.HasOne(d => d.ScheduledByNavigation).WithMany(p => p.SitevisitScheduledByNavigations)
-                .HasForeignKey(d => d.ScheduledBy)
-                .HasConstraintName("sitevisits_ibfk_3");
+            entity.HasOne(d => d.ScheduledByUser)
+    .WithMany()
+    .HasForeignKey(d => d.ScheduledBy)
+    .HasConstraintName("sitevisits_ibfk_3");
         });
 
         modelBuilder.Entity<Transaction>(entity =>

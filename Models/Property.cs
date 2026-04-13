@@ -30,6 +30,19 @@ namespace RealEstateManagement.Models
         public int? BrokerId { get; set; }
 
         public int? BudderId { get; set; }
+        public decimal? CarpetArea { get; set; }
+        public decimal? BuiltUpArea { get; set; }
+        public decimal? SuperBuiltUpArea { get; set; }
+
+        public int? Balconies { get; set; }
+        public int? TotalFloors { get; set; }
+        public int? FloorNumber { get; set; }
+
+        public int? AvailabilityStatus { get; set; }
+        public int? OwnershipType { get; set; }
+
+        public decimal? PricePerSqFt { get; set; }
+        public bool IsNegotiable { get; set; }
 
         [Required(ErrorMessage = "Price is required")]
         [Range(1, 999999999.99, ErrorMessage = "Price must be greater than 0")]

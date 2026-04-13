@@ -22,7 +22,7 @@ namespace RealEstateManagement.Models
 
         [StringLength(500)]
         public string? Description { get; set; }
-
+        public string? City { get; set; }
         public bool IsActive { get; set; } = true;
 
         public DateTime CreatedDate { get; set; } = DateTime.Now;

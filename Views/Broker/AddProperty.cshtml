@@ -3,213 +3,522 @@
     ViewBag.Title = "List New Property - Broker";
 }
 <style>
-#map {
-    z-index: 1;
-    position: relative;
-}
+/* KEEP YOUR EXISTING */
+#map { z-index:1; position:relative; }
+.address-container { position:relative; }
 
-.address-container {
-    position: relative;
-}
-
-/* Suggestions DROPDOWN */
+/* Suggestions */
 #suggestions {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    background: white;
+    position:absolute;
+    top:100%;
+    left:0;
+    width:100%;
+    background:white;
+    border:1px solid #ccc;
+    max-height:150px;
+    overflow-y:auto;
+    z-index:9999;
+    display:none;
+}
+#suggestions.active { display:block; }
+#suggestions:empty { display:none; }
+
+/* NEW STEP UI */
+.step-sidebar {
+    background:#f8f5f0;
+    padding:20px;
+    border-radius:12px;
+}
+.step {
+    padding:12px;
+    border-left:4px solid #ddd;
+    margin-bottom:10px;
+}
+.step.active {
+    border-left:4px solid #b08968;
+    color:#b08968;
+    font-weight:bold;
+}
+
+.card {
+    border-radius:12px;
+}
+
+.btn-primary {
+    background:#b08968;
+    border:none;
+}
+.chip {
     border: 1px solid #ccc;
-    max-height: 150px;
-    overflow-y: auto;
-    z-index: 9999;
-    display: none; /* 🔥 ADD THIS */
+    padding: 8px 14px;
+    border-radius: 20px;
+    background: #fff;
+    cursor: pointer;
+    transition: 0.2s;
 }
 
-#suggestions.active {
-    display: block;
+.chip:hover {
+    border-color: #b08968;
+    color: #b08968;
 }
 
-/* Hide when empty */
-#suggestions:empty {
-    display: none;
+.chip.active {
+    background: #b08968;
+    color: white;
+    border-color: #b08968;
 }
 
-/* Map stays below */
-#map {
-    z-index: 1;
+.add-btn {
+    border-style: dashed;
+}
+.area-horizontal {
+    display: flex;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.no-border {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.no-border:focus {
+    box-shadow: none !important;
+}
+
+.unit-dropdown {
+    width: 110px;
+    border: none;
+    border-left: 1px solid #ddd;
+    background: #fff;
+}
+
+.unit-dropdown:focus {
+    box-shadow: none;
+    border-color: #b08968;
 }
 </style>
+</style>
 
-<div class="container py-5">
+<div class="container-fluid py-5">
+<div class="row">
+
+<!-- SIDEBAR -->
+<div class="col-md-3">
+    <div class="step-sidebar">
+        <div class="step-sidebar">
+    <div class="step active" id="s1">Owner Details</div>
+    <div class="step" id="s2">Basic Details</div>
+    <div class="step" id="s3">Location</div>
+    <div class="step" id="s4">Property Profile</div>
+    <div class="step" id="s5">Photos & Videos</div>
+    <div class="step" id="s6">Final</div>
+</div>
+    </div>
+</div>
+
+<!-- CONTENT -->
+<div class="col-md-9">
+<div class="card p-4">
+
+<form asp-action="AddProperty" method="post" enctype="multipart/form-data">
+<div asp-validation-summary="All" class="text-danger"></div>
+<div id="step1">
+<h4>Owner Details</h4>
+
+<!-- SELECT EXISTING OWNER -->
+<div class="mb-3">
+    <label>Select Owner</label>
+    <select name="OwnerId" id="OwnerId" class="form-control">
+        <option value="">-- Select Owner --</option>
+       @foreach (var user in ViewBag.Owners)
+{
+    <option value="@user.UserId">
+        @user.FirstName @user.LastName - @user.PhoneNumber
+    </option>
+}
+    </select>
+</div>
+
+<!-- ADD NEW OWNER BUTTON -->
+<button type="button" class="btn btn-outline-primary mb-3" onclick="toggleOwnerForm()">
+    ➕ Add New Owner
+</button>
+
+<!-- NEW OWNER FORM -->
+<div id="newOwnerForm" style="display:none;">
+
     <div class="row">
-        <div class="col-lg-8 offset-lg-2">
-            <div class="card">
-                <div class="card-header">
-                    <h4 style="margin: 0;"><i class="fas fa-plus"></i> List New Property</h4>
-                </div>
-                <div class="card-body">
-                    <form method="post" enctype="multipart/form-data" novalidate>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Property Title</label>
-                                <input asp-for="PropertyTitle" class="form-control" required>
-                                <span asp-validation-for="PropertyTitle" class="invalid-feedback"></span>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Property Type</label>
-                                <select asp-for="PropertyTypeId" class="form-select" required>
-                                    <option value="">Select Type</option>
-                                    @foreach (var type in ViewBag.PropertyTypes)
-                                    {
-                                        <option value="@type.PropertyTypeId">@type.TypeName</option>
-                                    }
-                                </select>
-                                <span asp-validation-for="PropertyTypeId" class="invalid-feedback"></span>
-                            </div>
-                        </div>
+        <div class="col-md-6 mb-3">
+            <label>Owner Name</label>
+            <input type="text" name="NewOwnerName" class="form-control" />
+        </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Locality</label>
-                                <select asp-for="LocalityId" class="form-select" required>
-                                    <option value="">Select Locality</option>
-                                    @foreach (var locality in ViewBag.Localities)
-                                    {
-                                        <option value="@locality.LocalityId">@locality.LocalityName</option>
-                                    }
-                                </select>
-                                <span asp-validation-for="LocalityId" class="invalid-feedback"></span>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Transaction Type</label>
-                                <select asp-for="TransactionType" class="form-select" required>
-                                    <option value="">Select Type</option>
-                                    <option value="0">Buy</option>
-                                    <option value="1">Sell</option>
-                                    <option value="2">Rent</option>
-                                </select>
-                                <span asp-validation-for="TransactionType" class="invalid-feedback"></span>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Property Description</label>
-                            <textarea asp-for="PropertyDescription" class="form-control" rows="4" required></textarea>
-                            <span asp-validation-for="PropertyDescription" class="invalid-feedback"></span>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Price (₹)</label>
-                                <input asp-for="PropertyPrice" type="number" class="form-control" required>
-                                <span asp-validation-for="PropertyPrice" class="invalid-feedback"></span>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <label class="form-label">Area</label>
-                                <input asp-for="PropertyArea" type="number" step="0.01" class="form-control" required>
-                                <span asp-validation-for="PropertyArea" class="invalid-feedback"></span>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <label class="form-label">Unit</label>
-                                <select asp-for="AreaUnit" class="form-select">
-                                    <option value="0">SqFt</option>
-                                    <option value="1">SqMeter</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Bedrooms</label>
-                                <input asp-for="Bedrooms" type="number" class="form-control">
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Bathrooms</label>
-                                <input asp-for="Bathrooms" type="number" class="form-control">
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label">Parking Spots</label>
-                                <input asp-for="Parking" type="number" class="form-control">
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Furnishing</label>
-                                <select asp-for="Furnishing" class="form-select">
-                                    <option value="0">Unfurnished</option>
-                                    <option value="1">SemiFurnished</option>
-                                    <option value="2">Furnished</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Facing</label>
-                                <select asp-for="Facing" class="form-select">
-                                    <option value="0">North</option>
-                                    <option value="1">South</option>
-                                    <option value="2">East</option>
-                                    <option value="3">West</option>
-                                    <option value="4">NorthEast</option>
-                                    <option value="5">NorthWest</option>
-                                    <option value="6">SouthEast</option>
-                                    <option value="7">SouthWest</option>
-                                </select>
-                            </div>
-                        </div>
-
-                       <div class="mb-3">
-    <label class="form-label">Address</label>
-
-                        <!-- NEW WRAPPER -->
-                        <div class="address-container">
-                            <input id="addressInput" asp-for="Address" class="form-control" placeholder="Enter location in Surat" required>
-
-                            <div id="suggestions"></div>
-                        </div>
-
-                        <!-- Hidden fields -->
-                        <input type="hidden" id="Latitude" name="Latitude" />
-                        <input type="hidden" id="Longitude" name="Longitude" />
-
-                        <!-- Map -->
-                        <div id="map" style="height: 300px; margin-top:10px;"></div>
-
-                        <span asp-validation-for="Address" class="invalid-feedback"></span>
-                    </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Landmark Description</label>
-                            <textarea asp-for="LandmarkDescription" class="form-control" rows="3"></textarea>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Property Features</label>
-                            <textarea asp-for="Features" class="form-control" rows="3" placeholder="e.g., Balcony, Garden, Security, etc."></textarea>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Property Age (years)</label>
-                            <input asp-for="AgeOfProperty" type="number" class="form-control">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Main Image</label>
-                            <input type="file" name="mainImage" class="form-control" accept="image/*">
-                            <small class="text-muted">JPG, PNG (Max 5MB)</small>
-                        </div>
-
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-plus"></i> List Property
-                            </button>
-                            <a href="/Broker/Index" class="btn btn-secondary">Cancel</a>
-                        </div>
-                    </form>
-                </div>
-            </div>
+        <div class="col-md-6 mb-3">
+            <label>Owner Phone</label>
+            <input type="text" name="NewOwnerPhone" class="form-control" />
         </div>
     </div>
+
+    <div class="mb-3">
+        <label>Email (optional)</label>
+        <input type="email" name="NewOwnerEmail" class="form-control" />
+    </div>
+
+</div>
+
+<button type="button" class="btn btn-primary" onclick="nextStep(1)">Continue</button>
+
+</div>
+<!-- STEP 2 -->
+<div id="step2" style="display:none;">
+
+<h4>Basic Details</h4>
+
+<div class="row">
+<div class="col-md-6 mb-3">
+<label>Property Title</label>
+<input asp-for="PropertyTitle" class="form-control" required>
+</div>
+
+<div class="col-md-6 mb-3">
+<label class="mb-2">Property Type</label>
+
+<div class="d-flex flex-wrap gap-2">
+
+    @foreach (var type in ViewBag.PropertyTypes)
+    {
+        <button type="button"
+                class="chip"
+                onclick="selectPropertyType(@type.PropertyTypeId, this)">
+            @type.TypeName
+        </button>
+    }
+
+</div>
+
+<!-- Hidden field for binding -->
+<input type="hidden" asp-for="PropertyTypeId" id="PropertyTypeId"/></div>
+</div>
+
+<div class="row">
+<div class="col-md-6 mb-3">
+<label>Locality</label>
+<select asp-for="LocalityId" class="form-select" required>
+<option value="">Select Locality</option>
+@foreach (var locality in ViewBag.Localities)
+{
+<option value="@locality.LocalityId">@locality.LocalityName</option>
+}
+</select>
+</div>
+
+<div class="col-md-6 mb-3">
+<label>Transaction Type</label>
+<select asp-for="TransactionType" class="form-select">
+<option value="0">Buy</option>
+<option value="1">Sell</option>
+<option value="2">Rent</option>
+</select>
+</div>
+</div>
+
+<button type="button" class="btn btn-primary" onclick="nextStep(2)">Continue</button>
+</div>
+
+<!-- STEP 3 -->
+<div id="step3" style="display:none;">
+
+<h4>Location Details</h4>
+
+<div class="mb-3">
+<label>Address</label>
+<div class="address-container">
+<input id="addressInput" asp-for="Address" class="form-control" required>
+<div id="suggestions"></div>
+</div>
+
+<input type="hidden" asp-for="Latitude" id="Latitude" />
+<input type="hidden" asp-for="Longitude" id="Longitude" />
+
+<div id="map" style="height:300px; margin-top:10px;"></div>
+</div>
+
+<button type="button" onclick="prevStep(2)">Back</button>
+<button type="button" onclick="nextStep(3)">Continue</button>
+</div>
+
+<!-- STEP 3 -->
+<div id="step4" style="display:none;">
+
+<h4 class="mb-4">Property Profile</h4>
+
+<!-- AREA DETAILS -->
+<h5 class="mb-3">Area Details</h5>
+
+<div class="row">
+
+    <!-- Carpet Area -->
+    <div class="col-md-4 mb-3">
+        <label>Carpet Area</label>
+        <div class="area-horizontal">
+            <input asp-for="CarpetArea" class="form-control no-border" placeholder="Enter area" />
+            
+            <select name="CarpetAreaUnit" class="unit-dropdown">
+                <option value="sqft">sq.ft.</option>
+                <option value="sqyard">sq.yards</option>
+                <option value="sqm">sq.m.</option>
+                <option value="acre">acres</option>
+                <option value="marla">marla</option>
+                <option value="cent">cents</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Built-up Area -->
+    <div class="col-md-4 mb-3">
+        <label>Built-up Area</label>
+        <div class="area-horizontal">
+            <input asp-for="BuiltUpArea" class="form-control no-border" placeholder="Enter area" />
+            
+            <select name="BuiltUpAreaUnit" class="unit-dropdown">
+                <option value="sqft">sq.ft.</option>
+                <option value="sqyard">sq.yards</option>
+                <option value="sqm">sq.m.</option>
+                <option value="acre">acres</option>
+                <option value="marla">marla</option>
+                <option value="cent">cents</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Super Built-up Area -->
+    <div class="col-md-4 mb-3">
+        <label>Super Built-up Area</label>
+        <div class="area-horizontal">
+            <input asp-for="SuperBuiltUpArea" class="form-control no-border" placeholder="Enter area" />
+            
+            <select name="SuperBuiltUpAreaUnit" class="unit-dropdown">
+                <option value="sqft">sq.ft.</option>
+                <option value="sqyard">sq.yards</option>
+                <option value="sqm">sq.m.</option>
+                <option value="acre">acres</option>
+                <option value="marla">marla</option>
+                <option value="cent">cents</option>
+            </select>
+        </div>
+    </div>
+
+</div>
+
+<!-- ROOM DETAILS -->
+<h5 class="mb-3 mt-4">Room Details</h5>
+<div class="row">
+    <div class="col-md-4 mb-3">
+        <label>Bedrooms</label>
+        <input asp-for="Bedrooms" class="form-control" />
+    </div>
+    <div class="col-md-4 mb-3">
+        <label>Bathrooms</label>
+        <input asp-for="Bathrooms" class="form-control" />
+    </div>
+    <div class="mb-3">
+    <label class="mb-2">Balconies</label>
+
+    <div class="d-flex flex-wrap gap-2">
+
+        <button type="button" class="chip" onclick="selectBalcony(0)">0</button>
+        <button type="button" class="chip" onclick="selectBalcony(1)">1</button>
+        <button type="button" class="chip" onclick="selectBalcony(2)">2</button>
+        <button type="button" class="chip" onclick="selectBalcony(3)">3</button>
+        <button type="button" class="chip" onclick="selectBalcony(4)">More than 3</button>
+
+        <button type="button" class="chip add-btn" onclick="showCustomBalcony()">+ Add other</button>
+    </div>
+
+    <!-- Hidden field -->
+    <input type="hidden" asp-for="Balconies" id="Balconies" />
+
+    <!-- Custom input -->
+    <input type="number" id="customBalcony" class="form-control mt-2" placeholder="Enter balconies"
+           style="display:none;" oninput="setCustomBalcony()" />
+</div>
+</div>
+
+<!-- FLOOR DETAILS -->
+<h5 class="mb-3 mt-4">Floor Details</h5>
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label>Total Floors</label>
+        <input asp-for="TotalFloors" class="form-control" />
+    </div>
+    <div class="mb-3">
+    <label>Property on Floor</label>
+    <select asp-for="FloorNumber" class="form-select">
+        <option value="">Select Floor</option>
+        <option value="-2">Basement</option>
+        <option value="-1">Lower Ground</option>
+        <option value="0">Ground</option>
+
+        @for (int i = 1; i <= 20; i++)
+        {
+            <option value="@i">@i</option>
+        }
+    </select>
+</div>
+</div>
+
+<!-- AVAILABILITY -->
+<h5 class="mb-3 mt-4">Availability Status</h5>
+<select asp-for="AvailabilityStatus" class="form-select mb-3">
+    <option value="">Select</option>
+    <option value="0">Ready to Move</option>
+    <option value="1">Under Construction</option>
+</select>
+
+<!-- OWNERSHIP -->
+<h5 class="mb-3 mt-4">Ownership</h5>
+<select asp-for="OwnershipType" class="form-select mb-3">
+    <option value="">Select</option>
+    <option value="0">Freehold</option>
+    <option value="1">Leasehold</option>
+    <option value="2">Co-operative Society</option>
+    <option value="3">Power of Attorney</option>
+</select>
+
+<!-- FURNISHING & FACING -->
+<h5 class="mb-3 mt-4">Additional Details</h5>
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label>Furnishing</label>
+        <select asp-for="Furnishing" class="form-select">
+            <option value="0">Unfurnished</option>
+            <option value="1">Semi Furnished</option>
+            <option value="2">Fully Furnished</option>
+        </select>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <label>Facing</label>
+        <select asp-for="Facing" class="form-select">
+            <option value="0">North</option>
+            <option value="1">South</option>
+            <option value="2">East</option>
+            <option value="3">West</option>
+            <option value="4">North-East</option>
+            <option value="5">North-West</option>
+            <option value="6">South-East</option>
+            <option value="7">South-West</option>
+        </select>
+    </div>
+</div>
+
+<!-- AGE -->
+<div class="mb-3">
+    <label>Age of Property (years)</label>
+    <input asp-for="AgeOfProperty" class="form-control" />
+</div>
+
+<!-- PRICE DETAILS -->
+<h5 class="mb-3 mt-4">Price Details</h5>
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label>Expected Price (₹)</label>
+        <input asp-for="PropertyPrice" class="form-control" />
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <label>Price per sq.ft</label>
+        <input asp-for="PricePerSqFt" class="form-control" />
+    </div>
+</div>
+
+<div class="form-check mb-3">
+    <input asp-for="IsNegotiable" class="form-check-input" />
+    <label class="form-check-label">Price Negotiable</label>
+</div>
+
+<!-- NAVIGATION -->
+<div class="mt-4">
+    <button type="button" class="btn btn-secondary" onclick="prevStep(3)">Back</button>
+    <button type="button" class="btn btn-primary" onclick="nextStep(4)">Continue</button>
+</div>
+
+</div>
+<div id="step5" style="display:none;">
+
+<h4 class="mb-4">Photos & Videos</h4>
+    <!-- VIDEO UPLOAD -->
+    <div class="upload-card">
+        <h4>Add one video of property</h4>
+
+        <div class="upload-box" id="videoDrop">
+            <input type="file" name="videoFile" id="videoInput" accept="video/*" hidden />
+
+            <div class="upload-content">
+                <i class="fa fa-video-camera"></i>
+                <p>Drag video here or <span onclick="openVideo()">Upload</span></p>
+                <small>Max 80MB (.mp4, .mov)</small>
+                <div class="mb-3">
+    <label class="form-label">Upload Property Video</label>
+    <input type="file" name="video" class="form-control" accept="video/*" />
+</div>
+            </div>
+        </div>
+
+        <video id="videoPreview" controls style="display:none; width:200px;"></video>
+    </div>
+
+    <!-- IMAGE UPLOAD -->
+    <div class="upload-card">
+        <h4>Add photos of your property</h4>
+
+        <div class="upload-box" id="imageDrop">
+            <input type="file" name="imageFiles" id="imageInput" multiple accept="image/*" hidden />
+
+            <div class="upload-content">
+                <i class="fa fa-image"></i>
+                <p>Drag images here or <span onclick="openImages()">Upload</span></p>
+                <small>Max 50 images</small>
+                <div class="mb-3">
+    <label class="form-label">Upload Property Images</label>
+    <input type="file" name="images" multiple class="form-control" accept="image/*" />
+</div>
+            </div>
+        </div>
+
+        <div id="imagePreview" class="preview-grid"></div>
+            <button type="button" class="btn btn-primary" onclick="nextStep(5)">Continue</button>
+
+    </div>
+
+</div>
+<!-- STEP 5 -->
+<div id="step6" style="display:none;">
+
+<h4>Final Details</h4>
+
+<div class="mb-3">
+<label>Description</label>
+<textarea asp-for="PropertyDescription" class="form-control"></textarea>
+</div>
+
+<div class="mb-3">
+<label>Image</label>
+<input type="file" name="mainImage" class="form-control">
+</div>
+
+<button onclick="prevStep(4)">Back</button>
+<button type="submit" class="btn btn-success">Submit Property</button>
+</div>
+
+</form>
+</div>
+</div>
+
+</div>
 </div>
 <script src="/leaflet/leaflet.js"></script>
 <script>
@@ -361,4 +670,70 @@ document.getElementById("addressInput").addEventListener("change", function() {
             }
         });
 });
+</script>
+<script>
+function nextStep(current){
+    document.getElementById("step"+current).style.display="none";
+    document.getElementById("step"+(current+1)).style.display="block";
+
+    document.getElementById("s"+current).classList.remove("active");
+    document.getElementById("s"+(current+1)).classList.add("active");
+
+    // ✅ FIX FOR MAP
+    if(current + 1 === 3){
+        setTimeout(() => {
+            map.invalidateSize();
+        }, 300);
+    }
+}
+
+function prevStep(current){
+    document.getElementById("step"+current).style.display="none";
+    document.getElementById("step"+(current-1)).style.display="block";
+
+    document.getElementById("s"+current).classList.remove("active");
+    document.getElementById("s"+(current-1)).classList.add("active");
+}
+</script>
+<script>
+function selectBalcony(val) {
+
+    document.getElementById("Balconies").value = val;
+
+    document.querySelectorAll(".chip").forEach(btn => btn.classList.remove("active"));
+    event.target.classList.add("active");
+
+    document.getElementById("customBalcony").style.display = "none";
+}
+
+function showCustomBalcony() {
+    document.getElementById("customBalcony").style.display = "block";
+}
+
+function setCustomBalcony() {
+    let val = document.getElementById("customBalcony").value;
+    document.getElementById("Balconies").value = val;
+}
+</script>
+<script>
+    function toggleOwnerForm() {
+    const form = document.getElementById("newOwnerForm");
+    if (form) {
+        form.style.display = form.style.display === "none" ? "block" : "none";
+    }
+}
+
+function selectPropertyType(typeId, element) {
+
+    // set hidden field
+    document.getElementById("PropertyTypeId").value = typeId;
+
+    // remove active from all
+    document.querySelectorAll(".chip").forEach(btn => {
+        btn.classList.remove("active");
+    });
+
+    // add active to clicked
+    element.classList.add("active");
+}
 </script>

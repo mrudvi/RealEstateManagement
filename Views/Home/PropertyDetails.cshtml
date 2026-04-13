@@ -1,0 +1,560 @@
+@model RealEstateManagement.Models.Property
+<style>
+.property-image-box {
+    position: relative;
+}
+
+.price-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg, #D4A574, #B8956D);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.btn-theme-primary {
+    background: linear-gradient(135deg, #D4A574, #B8956D);
+    color: white;
+    border: none;
+}
+
+.btn-theme-secondary {
+    background: linear-gradient(135deg, #8B7355, #6B5744);
+    color: white;
+    border: none;
+}
+
+.btn-theme-primary:hover,
+.btn-theme-secondary:hover {
+    opacity: 0.9;
+}
+.gallery-wrapper {
+    position: relative;
+    margin-top: 10px;
+}
+
+.gallery-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 10px 30px;
+}
+
+.gallery-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.thumb-img {
+    min-width: 100px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 10px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: 0.3s;
+}
+
+.thumb-img:hover {
+    transform: scale(1.05);
+}
+
+.active-thumb {
+    border: 2px solid #D4A574;
+}
+
+/* VIDEO STYLE */
+.video-thumb {
+    background: black;
+}
+
+/* SCROLL BUTTONS */
+.scroll-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: white;
+    border: none;
+    font-size: 22px;
+    width: 35px;
+    height: 45px;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    z-index: 2;
+}
+
+.scroll-btn.left { left: 0; }
+.scroll-btn.right { right: 0; }
+.details-theme-card {
+    background: linear-gradient(135deg, #F8F6F2, #F3EDE4);
+    border-radius: 12px;
+    border: 1px solid #e5d8c7;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+}
+
+.details-theme-card strong {
+    color: #4a3b2c;
+    font-weight: 600;
+}
+
+.details-theme-card small {
+    font-size: 12px;
+}
+.btn-sm {
+    padding: 6px 14px;
+    font-size: 13px;
+    border-radius: 6px;
+}
+</style>
+<div class="container py-5">
+
+    <div class="row">
+
+        <!-- LEFT: IMAGE -->
+        <div class="col-md-6">
+            <div class="property-image-box">
+               <!-- MAIN IMAGE -->
+<div id="mainMedia">
+    <img id="mainImage"
+         src="@Url.Content("~/" + Model.MainImage)"
+         style="width:100%; height:420px; object-fit:cover;">
+</div>
+
+<!-- THUMBNAIL GALLERY -->
+<div class="gallery-wrapper">
+
+    <!-- LEFT BUTTON -->
+    <button class="scroll-btn left" onclick="scrollGallery(-1)">‹</button>
+
+    <!-- SCROLL AREA -->
+    <div id="galleryScroll" class="gallery-scroll">
+
+        <!-- MAIN IMAGE -->
+        <img src="@Url.Content("~/" + Model.MainImage)"
+             class="thumb-img active-thumb"
+             onclick="changeImage(this)">
+
+        <!-- MULTIPLE IMAGES -->
+        @if (ViewBag.Images != null)
+        {
+            foreach (var img in ViewBag.Images)
+            {
+                <img src="@Url.Content("~/" + img.ImagePath)"
+                     class="thumb-img"
+                     onclick="changeImage(this)">
+            }
+        }
+
+        <!-- VIDEO THUMB -->
+        @if (ViewBag.Video != null)
+        {
+            <video class="thumb-img video-thumb" onclick="playVideo(this)">
+                <source src="@Url.Content("~/" + ViewBag.Video.VideoPath)" type="video/mp4">
+            </video>
+        }
+
+    </div>
+
+    <!-- RIGHT BUTTON -->
+    <button class="scroll-btn right" onclick="scrollGallery(1)">›</button>
+
+</div>
+
+                <span class="price-badge">
+                    ₹@Model.PropertyPrice.ToString("N0")
+                </span>
+            </div>
+        </div>
+
+        <!-- RIGHT: DETAILS -->
+        <div class="col-md-6">
+
+            @* <h2 class="mb-3">@Model.PropertyTitle</h2>
+
+            <!-- Location -->
+            <p class="text-muted">
+                <i class="fas fa-map-marker-alt"></i>
+                @(Model.Locality != null 
+                    ? Model.Locality.City + ", " + Model.Locality.LocalityName 
+                    : "N/A")
+            </p> *@
+
+    <!-- LEFT -->
+   <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
+
+    <!-- LEFT SIDE -->
+    <div>
+
+        <!-- TITLE -->
+        <h2 class="mb-1 fw-semibold">
+            @Model.PropertyTitle
+        </h2>
+
+        <!-- LOCATION -->
+        <p class="text-muted mb-1" style="font-size:14px;">
+            <i class="fas fa-map-marker-alt"></i>
+            @(Model.Locality != null 
+                ? Model.Locality.City + ", " + Model.Locality.LocalityName 
+                : "N/A")
+        </p>
+
+        <!-- BROKER + OWNER -->
+        @if (ViewBag.Broker != null)
+        {
+            <div style="font-size:13px; line-height:1.4;">
+                <span style="color:#8B7355;">
+                    Listed by Broker: 
+                    <strong>@ViewBag.Broker.FirstName @ViewBag.Broker.LastName</strong>
+                </span>
+
+                @if (ViewBag.Owner != null)
+                {
+                    <br />
+                    <span class="text-muted">
+                        Owner: @ViewBag.Owner.FirstName @ViewBag.Owner.LastName
+                    </span>
+                }
+            </div>
+        }
+        else if (ViewBag.Owner != null)
+        {
+            <div style="font-size:13px;">
+                <span style="color:#8B7355;">
+                    Owner: <strong>@ViewBag.Owner.FirstName @ViewBag.Owner.LastName</strong>
+                </span>
+            </div>
+        }
+
+    </div>
+
+    <!-- RIGHT SIDE BUTTON -->
+    <div class="mt-2">
+
+        @if (ViewBag.Broker != null && !string.IsNullOrEmpty(ViewBag.Broker.PhoneNumber))
+        {
+            <a href="tel:@ViewBag.Broker.PhoneNumber" class="btn btn-call">
+                📞 Call Broker
+            </a>
+        }
+        else if (ViewBag.Owner != null && !string.IsNullOrEmpty(ViewBag.Owner.PhoneNumber))
+        {
+            <a href="tel:@ViewBag.Owner.PhoneNumber" class="btn btn-call">
+                📞 Call Owner
+            </a>
+        }
+
+    </div>
+
+</div>
+
+            <!-- Specs -->
+            <div class="d-flex gap-4 my-3 text-muted">
+
+                <div>
+                    <i class="fas fa-ruler"></i> 
+                    @Model.PropertyArea @Model.AreaUnit
+                </div>
+
+                @if (Model.Bedrooms > 0)
+                {
+                    <div>
+                        <i class="fas fa-bed"></i> 
+                        @Model.Bedrooms BHK
+                    </div>
+                }
+            </div>
+
+            <hr>
+
+            <!-- Buttons -->
+            <div class="d-flex gap-3">
+
+                <button class="btn btn-theme-primary w-100"
+                        onclick="openEnquiry(@Model.PropertyId)">
+                    📞 Contact Owner
+                </button>
+
+                <button class="btn btn-theme-secondary w-100"
+                        onclick="openVisit(@Model.PropertyId)">
+                    📅 Schedule Visit
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+    <div class="mt-5">
+
+    <h4 class="mb-4" style="color:#8B7355; font-weight:600;">
+        More Details
+    </h4>
+
+    <div class="details-theme-card p-4">
+
+        <div class="row">
+
+            <div class="col-md-4 mb-3">
+                <small class="text-muted">Price</small><br />
+                <strong>₹@Model.PropertyPrice.ToString("N0")</strong>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <small class="text-muted">Area</small><br />
+                <strong>@Model.PropertyArea @Model.AreaUnit</strong>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <small class="text-muted">Bedrooms</small><br />
+                <strong>@Model.Bedrooms BHK</strong>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <small class="text-muted">Bathrooms</small><br />
+                <strong>@Model.Bathrooms</strong>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <small class="text-muted">Parking</small><br />
+                <strong>@Model.Parking</strong>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <small class="text-muted">Furnishing</small><br />
+                <strong>@Model.Furnishing</strong>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <small class="text-muted">Facing</small><br />
+                <strong>@Model.Facing</strong>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <small class="text-muted">Property Age</small><br />
+                <strong>@Model.AgeOfProperty Years</strong>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <small class="text-muted">Transaction</small><br />
+                <strong>@Model.TransactionType</strong>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <small class="text-muted">Status</small><br />
+                <strong>@Model.Status</strong>
+            </div>
+
+            <div class="col-md-8 mb-3">
+                <small class="text-muted">Address</small><br />
+                <strong>@Model.Address</strong>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+    <!-- DESCRIPTION -->
+    <div class="mt-5">
+        <h4>Description</h4>
+        <p class="text-muted">
+            @Model.PropertyDescription
+        </p>
+    </div>
+
+</div>
+<!-- ENQUIRY MODAL -->
+<div class="modal fade" id="enquiryModal">
+    <div class="modal-dialog">
+        <div class="modal-content p-3">
+
+            <input type="hidden" id="enquiryPropertyId" />
+
+            <input type="text" id="name" class="form-control mb-2" placeholder="Your Name" />
+            <input type="text" id="phone" class="form-control mb-2" placeholder="Phone" />
+            <textarea id="message" class="form-control mb-2" placeholder="Message"></textarea>
+
+            <button class="btn btn-theme-primary" onclick="submitEnquiry()">Submit</button>
+
+        </div>
+    </div>
+</div>
+
+<!-- VISIT MODAL -->
+<div class="modal fade" id="visitModal">
+    <div class="modal-dialog">
+        <div class="modal-content p-3">
+
+            <input type="hidden" id="visitPropertyId" />
+
+<input type="date" id="date" class="form-control" />
+<input type="time" id="time" class="form-control" />
+
+<textarea id="message" class="form-control"></textarea>
+
+            <button class="btn btn-theme-secondary" onclick="submitVisit()">📅 Schedule Visit</button>
+
+        </div>
+    </div>
+</div>
+<script>
+
+// ===================== ENQUIRY =====================
+
+function openEnquiry(propertyId) {
+    document.getElementById("enquiryPropertyId").value = propertyId;
+
+    // Optional auto message
+    document.getElementById("message").value = "I am interested in this property.";
+
+    var enquiryModal = new bootstrap.Modal(document.getElementById('enquiryModal'));
+    enquiryModal.show();
+}
+
+function submitEnquiry() {
+    var propertyId = document.getElementById("enquiryPropertyId").value;
+    var name = document.getElementById("name").value;
+    var phone = document.getElementById("phone").value;
+    var message = document.getElementById("message").value;
+
+    fetch('/Home/AddEnquiry', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            PropertyId: propertyId,
+            Name: name,
+            Phone: phone,
+            Message: message
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert("Enquiry Sent Successfully!");
+
+        // Close modal
+        var modalEl = document.getElementById('enquiryModal');
+        var modal = bootstrap.Modal.getInstance(modalEl);
+        modal.hide();
+
+        // Clear fields
+        document.getElementById("name").value = "";
+        document.getElementById("phone").value = "";
+        document.getElementById("message").value = "";
+    })
+    .catch(error => {
+        console.error(error);
+        alert("Error sending enquiry");
+    });
+}
+
+
+// ===================== VISIT =====================
+
+function openVisit(propertyId) {
+    document.getElementById("visitPropertyId").value = propertyId;
+
+    var visitModal = new bootstrap.Modal(document.getElementById('visitModal'));
+    visitModal.show();
+}
+
+function changeImage(el) {
+
+    const container = document.getElementById("mainMedia");
+
+    container.innerHTML = `
+        <img id="mainImage"
+             src="${el.src}"
+             style="width:100%; height:420px; object-fit:cover;">
+    `;
+
+    document.querySelectorAll(".thumb-img").forEach(i => {
+        i.classList.remove("active-thumb");
+    });
+
+    el.classList.add("active-thumb");
+}
+
+function scrollGallery(direction) {
+    const container = document.getElementById("galleryScroll");
+    container.scrollLeft += direction * 300;
+}
+
+function playVideo(el) {
+
+    let videoSrc = "";
+
+    // Try to get source safely
+    const source = el.querySelector("source");
+
+    if (source) {
+        videoSrc = source.src;
+    } else {
+        // fallback if source tag missing
+        videoSrc = el.src;
+    }
+
+    const container = document.getElementById("mainMedia");
+
+    if (!container) return;
+
+    container.innerHTML = `
+        <video controls autoplay
+            style="width:100%; height:420px; object-fit:cover;">
+            <source src="${videoSrc}" type="video/mp4">
+        </video>
+    `;
+}
+</script>
+@section Scripts {
+<script>
+
+function submitVisit() {
+    const date = document.getElementById("date").value;
+const time = document.getElementById("time").value;
+
+if (!date) {
+    alert("Please select date");
+    return;
+}
+
+if (!time) {
+    alert("Please select time");
+    return;
+}
+   fetch('/Home/BookVisit', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        propertyId: @Model.PropertyId,
+        scheduledDate: document.getElementById("date").value,
+        scheduledTime: document.getElementById("time").value + ":00",
+        notes: document.getElementById("message").value
+    })
+})
+.then(async res => {
+    const text = await res.text();
+
+    try {
+        const data = JSON.parse(text);
+
+        if (data.success) {
+            alert("Visit scheduled successfully");
+            location.reload();
+        } else {
+            alert(data.message);
+        }
+    } catch (e) {
+        console.error("RAW ERROR:", text);
+        alert("Server error: " + text);
+    }
+});
+}
+</script>
+}

@@ -85,8 +85,11 @@
                                 }
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="/Customer/Profile">Profile</a></li>
-                                <li><a class="dropdown-item" href="/Auth/Logout">Logout</a></li>
-                            </ul>
+                                <li>
+                                    <form method="post" action="/Auth/Logout" style="display:inline;">
+                                        <button type="submit" class="dropdown-item">Logout</button>
+                                    </form>
+                                </li>                            </ul>
                         </li>
                     }
                 </ul>
